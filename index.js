@@ -2,6 +2,8 @@ if (typeof AFRAME === 'undefined') {
   throw new Error('Component attempted to register before AFRAME was available.');
 }
 
+var d3 = require("d3")
+
 /**
  * Graph component for A-Frame.
  */
@@ -83,12 +85,12 @@ AFRAME.registerComponent('graph', {
      * This gives a solid reference point for scaling data.
      * It is positioned at the vertex of the left grid and bottom grid (towards the front).
      */
-    var originPointPosition = (-width / 2) + " 0 " + (width / 2);
+    var originPointPosition = (-width / 2) + " 0 " + (depth / 2);
     var originPointID = "originPoint" + data.id;
 
     d3.select(el).append("a-entity")
                  .attr("id", originPointID)
-                 .attr("position", originPointPosition);
+                 .attr("position", originPointPosition)
                  // DEBUG
                  //.attr("geometry", "primitive: sphere; radius: 0.021")
                  //.attr("material", "color: green");
