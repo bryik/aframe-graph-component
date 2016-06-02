@@ -1,0 +1,22 @@
+<html>
+  <head>
+    <title>A-Frame Graph Component - Range test</title>
+    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="../build.js"></script>
+  </head>
+  <body>
+    <a-scene stats antialias="true">
+      <a-entity light="type: ambient; color: #BBB"></a-entity>
+      <a-entity light="type: directional; color: #FFF; intensity: 0.6" position="-0.5 1 1"></a-entity>
+      <a-entity position="0 0.8 2">
+        <a-entity camera look-controls wasd-controls>
+          <a-cursor color="black" scale="2 2 2"></a-cursor>
+        </a-entity>
+      </a-entity>
+      <!-- Data from http://bl.ocks.org/phil-pedruco/9852362 -->
+      <a-entity position="0 0 0" graph="csv: lotsofdata.csv;"></a-entity>
+      <a-entity position="4 0 0" graph="id: 1; csv: lotsofdata.csv; width: 2; height: 2; depth: 2;"></a-entity>
+      <a-sky color="#fff"></a-sky>
+    </a-scene>
+  </body>
+</html>
