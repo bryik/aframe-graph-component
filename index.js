@@ -95,10 +95,8 @@ AFRAME.registerComponent('graph', {
                  //.attr("geometry", "primitive: sphere; radius: 0.021")
                  //.attr("material", "color: green");
 
-
-    /* Plot data from CSV */
-
     if ( data.csv ) {
+      /* Plot data from CSV */
 
       var originPoint = d3.select("#originPoint" + data.id);
 
@@ -114,7 +112,6 @@ AFRAME.registerComponent('graph', {
       });
 
       function plotData(data) {
-
         // Scale x, y, and z values
         // d3.extent is just short hand for d3.max and d3.min.
         var xExtent = d3.extent(data, function(d) { return d.x });
@@ -146,11 +143,10 @@ AFRAME.registerComponent('graph', {
                    .on("mouseleave", mouseLeave);
 
         /**
-         * Event listeners add and remove data labels
-         * Note: "this" refers to sphere element of a given data point.
+         * Event listeners add and remove data labels.
+         * "this" refers to sphere element of a given data point.
          */
         function mouseEnter() {
-
           // Retrieve original data
           var dataValues = this.__data__;
 
@@ -188,17 +184,16 @@ AFRAME.registerComponent('graph', {
   },
 });
 
-
 /* HELPER FUNCTIONS */
 
 /**
  * planeMaker() creates a plane given width and height (kind of).
- *  It is a helper function for gridMaker().
+ *  It is used by gridMaker().
  */
 function planeMaker(horizontal, vertical) {
-  // Controls the number of boxes in the grid horizontally and vertically
-  var squaresHorizontal = horizontal * 4;
-  var squaresVertical = vertical * 4;
+  // Controls texture repeat for U and V
+  var uHorizontal = horizontal * 4;
+  var vVertical = vertical * 4;
 
   // Load a texture, set wrap mode to repeat
   var texture = new THREE.TextureLoader().load( "/assets/grid-textures/grid3.png" );
@@ -207,7 +202,7 @@ function planeMaker(horizontal, vertical) {
   // should be: texture.anisotropy = renderer.getMaxAnisotropy();
   // but I can't figure out how to get this working
   texture.anisotropy = 16;
-  texture.repeat.set( squaresHorizontal, squaresVertical );
+  texture.repeat.set( uHorizontal, vVertical );
 
   // Create material and geometry
   var material = new THREE.MeshBasicMaterial( { map: texture, side: THREE.DoubleSide } );
@@ -218,7 +213,7 @@ function planeMaker(horizontal, vertical) {
 
 /**
  * gridMaker() creates a graphing box given width, height, and depth.
- * The number of squares per grid is scaled to these dimensions.
+ * The textures are also scaled to these dimensions.
  *
  * There are many ways this function could be improved or done differently
  * e.g. buffer geometry, merge geometry, better reuse of material/geometry.
