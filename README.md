@@ -1,4 +1,4 @@
-## aframe-graph-component
+## aframe-graph-component (WIP)
 
 An experimental component for graphing in [A-Frame](https://aframe.io). Currently only 3D scatter plots are supported.
 
