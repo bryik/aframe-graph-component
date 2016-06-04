@@ -1,5 +1,7 @@
 ## aframe-graph-component (WIP)
 
+This is a work-in-progress and not yet usable.
+
 An experimental component for graphing in [A-Frame](https://aframe.io). Currently only 3D scatter plots are supported.
 
 ### Properties
@@ -51,6 +53,14 @@ Alternative means of handling text were evaluated, but sprites were the only con
 
 The purpose of this component is to enable basic 3D graphing and explore the uses of D3 in A-Frame. If you are an expert D3 user (which I am not) you are probably better off using D3 to manipulate A-Frame directly as you will have more control (e.g. parsing data and using transitions). Be aware that [not everything works 100%](http://codepen.io/bryik/pen/ONdyJR). Forking this project might get you part of the way or at least give you some ideas, since it is built on the [A-Frame component boilerplate](https://github.com/ngokevin/aframe-component-boilerplate) the standard dev commands are available ("npm run dev" for a live server).
 
+### UTF-8
+
+Since D3 is a dependency, you'll need to set the charset to UTF-8 in the script tag.
+
+```html
+<script src="https://rawgit.com/bryik/aframe-graph-component/master/dist/aframe-graph-component.min.js" charset="utf-8"></script>
+```
+
 ### TODO
 
 1) Fix label/text issue
@@ -75,7 +85,7 @@ Install and use by directly including the [browser files](dist):
 <head>
   <title>My A-Frame Scene</title>
   <script src="https://aframe.io/releases/0.2.0/aframe.min.js"></script>
-  <script src="https://rawgit.com/bryik/aframe-graph-component/master/dist/aframe-graph-component.min.js"></script>
+  <script src="https://rawgit.com/bryik/aframe-graph-component/master/dist/aframe-graph-component.min.js" charset="utf-8"></script>
 </head>
 
 <body>
@@ -83,19 +93,4 @@ Install and use by directly including the [browser files](dist):
     <a-entity graph="csv: myData.csv; type: scatter"></a-entity>
   </a-scene>
 </body>
-```
-
-#### NPM Installation
-
-Install via NPM:
-
-```bash
-npm install aframe-graph-component
-```
-
-Then register and use.
-
-```js
-require('aframe');
-require('aframe-graph-component');
 ```
