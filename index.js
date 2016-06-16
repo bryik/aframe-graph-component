@@ -265,9 +265,10 @@ function spriteMaker (message) {
   // Draw
   context.fillText(message, x, y);
 
-  // Debug outline (to see canvas size)
-  context.fillStyle = 'rgb(200,0,0)';
-  context.strokeRect(0, 0, canvas.width, canvas.height);
+  /** DEBUG outline (to see canvas size)
+   * context.fillStyle = 'rgb(200,0,0)';
+   * context.strokeRect(0, 0, canvas.width, canvas.height);
+   */
 
   // canvas contents will be used for texture
   var texture = new THREE.Texture(canvas);

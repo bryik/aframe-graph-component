@@ -1,0 +1,17 @@
+<html>
+  <head>
+    <title>A-Frame Graph Component - View data labels</title>
+    <script src="../build.js" charset="utf-8"></script>
+    <script src="/assets/aframe-mouse-cursor-component/aframe-mouse-cursor-component.min.js"></script>
+</head>
+  </head>
+  <body>
+    <a-scene antialias="true">
+      <a-entity position="0 0.5 2">
+        <a-entity camera look-controls wasd-controls mouse-cursor></a-entity>
+      </a-entity>
+      <a-entity graph="csv: a-few-points.csv;"></a-entity>
+      <a-sky color="#fff"></a-sky>
+    </a-scene>
+  </body>
+</html>
