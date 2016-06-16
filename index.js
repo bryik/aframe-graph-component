@@ -53,33 +53,34 @@ AFRAME.registerComponent('graph', {
     var yRange = [0, height];
     var zRange = [0, -depth];
 
-    // Create graphbox Object3D to hold grids and axis labels
-    var graphbox = new THREE.Object3D();
+    // Create graphBox Object3D to hold grids and axis labels
+    var graphBox = new THREE.Object3D();
+    graphBox.name = 'graphBox';
 
     // Create graphing area out of three textured planes
     var grid = gridMaker(width, height, depth);
-    graphbox.add(grid);
+    graphBox.add(grid);
 
     // Label using sprites
     // using the same padding for all axes does not work very well...magic numbers for now
     var xLabel = spriteMaker('x');
     xLabel.position.z = (depth / 2) + 0.01;
     xLabel.position.y = -0.1;
-    graphbox.add(xLabel);
+    graphBox.add(xLabel);
 
     var yLabel = spriteMaker('y');
     yLabel.position.x = (width / 2) + 0.15;
     yLabel.position.z = -(depth / 2) - 0.1;
     yLabel.position.y = (height / 2);
-    graphbox.add(yLabel);
+    graphBox.add(yLabel);
 
     var zLabel = spriteMaker('z');
     zLabel.position.x = (width / 2) + 0.15;
     zLabel.position.y = -0.1;
-    graphbox.add(zLabel);
+    graphBox.add(zLabel);
 
-    // Add completed graphbox to element's Object3D
-    object3D.add(graphbox);
+    // Add completed graphBox to element's Object3D
+    object3D.add(graphBox);
 
     /**
      * Create origin point.
@@ -158,27 +159,27 @@ AFRAME.registerComponent('graph', {
 
           // Create individual x, y, and z labels using original data values
           // round to 1 decimal space (should use d3 format for consistency later)
-          var xLabel = spriteMaker(d3.round(dataValues.x, 1) + ',');
-          label.add(xLabel);
+          var spriteLabelText = '(' + d3.round(dataValues.x, 1) + ',' + d3.round(dataValues.y, 1) + ',' + d3.round(dataValues.z, 1) + ')';
+          var spriteLabel = spriteMaker(spriteLabelText);
+          label.add(spriteLabel);
 
-          var yLabel = spriteMaker(d3.round(dataValues.y, 1) + ',');
-          yLabel.position.x = 0.15;
-          label.add(yLabel);
+          // Position label above graph
+          label.position.y = 1;
 
-          var zLabel = spriteMaker(d3.round(dataValues.z, 2));
-          zLabel.position.x = 0.30;
-          label.add(zLabel);
-
-          // Position label above and behind data point
-          label.position.y = 0.1;
-          label.position.z = -0.1;
+          // Highlight selected data point
+          this.setAttribute('color', 'blue');
+          this.setAttribute('radius', 0.03);
 
           this.object3D.add(label);
         }
 
         function mouseLeave () {
+          // Retrieve label and remove
           var label = this.object3D.getObjectByName('tempDataLabel');
           this.object3D.remove(label);
+          // Remove highlight selected data point
+          this.setAttribute('color', 'red');
+          this.setAttribute('radius', 0.02);
         }
       };
     }
@@ -253,22 +254,28 @@ function spriteMaker (message) {
   var canvas = document.createElement('canvas');
   var context = canvas.getContext('2d');
 
-  canvas.width = 64;
-  canvas.height = 64;
+  canvas.width = 256;
+  canvas.height = 256;
 
   // Scaling text to fit canvas...is tricky
   // http://stackoverflow.com/questions/4114052/best-method-of-scaling-text-to-fill-an-html5-canvas
-  context.font = "20px 'Helvetica'";
-  var metrics = context.measureText(message);
-  var textWidth = metrics.width;
 
-  var scalex = (canvas.width / textWidth);
-  var scaley = (canvas.height / 20);
+  // Setup font
+  context.font = "50px 'Helvetica'";
 
-  var ypos = (canvas.height / (scaley * 1.25));
+  // Measure text width
+  var text = context.measureText(message);
 
-  context.scale(scalex, scaley);
-  context.fillText(message, 0, ypos);
+  // Calculate position of text
+  var x = (canvas.width / 2) - (text.width / 2);
+  var y = canvas.height / 2;
+
+  // Draw
+  context.fillText(message, x, y);
+
+  // Debug outline (to see canvas size)
+  context.fillStyle = 'rgb(200,0,0)';
+  context.strokeRect(0, 0, canvas.width, canvas.height);
 
   // canvas contents will be used for texture
   var texture = new THREE.Texture(canvas);
@@ -277,6 +284,6 @@ function spriteMaker (message) {
 
   var spriteMaterial = new THREE.SpriteMaterial({ map: texture });
   var sprite = new THREE.Sprite(spriteMaterial);
-  sprite.scale.set(0.125, 0.125, 0.125);
+  sprite.scale.set(0.5, 0.5, 0.5);
   return sprite;
 }
