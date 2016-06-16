@@ -142,44 +142,36 @@ AFRAME.registerComponent('graph', {
                    .attr('position', function (d) {
                      return xScale(d.x) + ' ' + yScale(d.y) + ' ' + zScale(d.z);
                    })
-                   .on('mouseenter', mouseEnter)
-                   .on('mouseleave', mouseLeave);
+                   .on('mouseenter', mouseEnter);
 
         /**
-         * Event listeners add and remove data labels.
+         * Event listener adds and removes data labels.
          * "this" refers to sphere element of a given data point.
          */
         function mouseEnter () {
-          // Retrieve original data
-          var dataValues = this.__data__;
+          // Get height of graphBox (needed to scale label position)
+          var graphBoxEl = this.parentElement.parentElement;
+          var graphBoxData = graphBoxEl.components.graph.data;
+          var graphBoxHeight = graphBoxData.height;
 
-          // Give label object a name so it can be removed later
-          var label = new THREE.Object3D();
-          label.name = 'tempDataLabel';
+          // Look for an existing label
+          var originPointObject3D = this.parentElement.object3D;
+          var oldLabel = originPointObject3D.getObjectByName('tempDataLabel');
 
-          // Create individual x, y, and z labels using original data values
-          // round to 1 decimal space (should use d3 format for consistency later)
-          var spriteLabelText = '(' + d3.round(dataValues.x, 1) + ',' + d3.round(dataValues.y, 1) + ',' + d3.round(dataValues.z, 1) + ')';
-          var spriteLabel = spriteMaker(spriteLabelText);
-          label.add(spriteLabel);
-
-          // Position label above graph
-          label.position.y = 1;
-
-          // Highlight selected data point
-          this.setAttribute('color', 'blue');
-          this.setAttribute('radius', 0.03);
-
-          this.object3D.add(label);
-        }
-
-        function mouseLeave () {
-          // Retrieve label and remove
-          var label = this.object3D.getObjectByName('tempDataLabel');
-          this.object3D.remove(label);
-          // Remove highlight selected data point
-          this.setAttribute('color', 'red');
-          this.setAttribute('radius', 0.02);
+          // If there is no existing label, make one
+          if (oldLabel === undefined) {
+            labelMaker(this, graphBoxHeight);
+          } else {
+            // Remove old label
+            var labeledData = oldLabel.parent;
+            labeledData.remove(oldLabel);
+            // Remove highlight
+            var labeledDataEl = labeledData.el;
+            labeledDataEl.setAttribute('color', 'red');
+            labeledDataEl.setAttribute('radius', 0.02);
+            // Create new one
+            labelMaker(this, graphBoxHeight);
+          }
         }
       };
     }
@@ -286,4 +278,36 @@ function spriteMaker (message) {
   var sprite = new THREE.Sprite(spriteMaterial);
   sprite.scale.set(0.5, 0.5, 0.5);
   return sprite;
+}
+
+/**
+ * labelMaker() creates a label for a given data point and graph height.
+ * Uses spriteMaker().
+ * dataEl - A data point's element.
+ * graphBoxHeight - The height of the graph.
+ */
+function labelMaker (dataEl, graphBoxHeight) {
+  // Retrieve original data
+  var dataValues = dataEl.__data__;
+
+  // Give label object a name so it can be removed later
+  var label = new THREE.Object3D();
+  label.name = 'tempDataLabel';
+
+  // Create individual x, y, and z labels using original data values
+  // round to 1 decimal space (should use d3 format for consistency later)
+  var spriteLabelText = '(' + d3.round(dataValues.x, 1) + ',' + d3.round(dataValues.y, 1) + ',' + d3.round(dataValues.z, 1) + ')';
+  var spriteLabel = spriteMaker(spriteLabelText);
+  label.add(spriteLabel);
+
+  // Position label above graph
+  var padding = 0.2;
+  var sphereYposition = dataEl.getAttribute('position').y;
+  label.position.y = (graphBoxHeight + padding) - sphereYposition;
+
+  // Highlight selected data point
+  dataEl.setAttribute('color', 'blue');
+  dataEl.setAttribute('radius', 0.03);
+
+  dataEl.object3D.add(label);
 }
