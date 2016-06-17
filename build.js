@@ -3,11 +3,12 @@ require('aframe');
 require('../index.js');
 
 },{"../index.js":2,"aframe":3}],2:[function(require,module,exports){
+/* global AFRAME, THREE */
 if (typeof AFRAME === 'undefined') {
   throw new Error('Component attempted to register before AFRAME was available.');
 }
 
-var d3 = require("d3");
+var d3 = require('d3');
 
 /**
  * Graph component for A-Frame.
@@ -15,26 +16,26 @@ var d3 = require("d3");
 AFRAME.registerComponent('graph', {
   schema: {
     csv: {
-      type: "string"
+      type: 'string'
     },
     type: {
-      type: "string",
-      default: "scatter"
+      type: 'string',
+      default: 'scatter'
     },
     id: {
-      type: "int",
-      default: "0"
+      type: 'int',
+      default: '0'
     },
     width: {
-      type: "number",
+      type: 'number',
       default: 1
     },
     height: {
-      type: "number",
+      type: 'number',
       default: 1
     },
     depth: {
-      type: "number",
+      type: 'number',
       default: 1
     }
   },
@@ -53,140 +54,133 @@ AFRAME.registerComponent('graph', {
     var depth = data.depth;
 
     // These will be used to set the range of the axes' scales
-    var xRange = [0, width]
-    var yRange = [0, height]
-    var zRange = [0, -depth]
+    var xRange = [0, width];
+    var yRange = [0, height];
+    var zRange = [0, -depth];
 
-    // Create graphbox Object3D to hold grids and axis labels
-    var graphbox = new THREE.Object3D();
+    // Create graphBox Object3D to hold grids and axis labels
+    var graphBox = new THREE.Object3D();
+    graphBox.name = 'graphBox';
 
     // Create graphing area out of three textured planes
     var grid = gridMaker(width, height, depth);
-    graphbox.add( grid );
+    graphBox.add(grid);
 
     // Label using sprites
     // using the same padding for all axes does not work very well...magic numbers for now
-    var xLabel = spriteMaker("x");
+    var xLabel = spriteMaker('x');
     xLabel.position.z = (depth / 2) + 0.01;
     xLabel.position.y = -0.1;
-    graphbox.add( xLabel );
+    graphBox.add(xLabel);
 
-    var yLabel = spriteMaker("y");
+    var yLabel = spriteMaker('y');
     yLabel.position.x = (width / 2) + 0.15;
     yLabel.position.z = -(depth / 2) - 0.1;
     yLabel.position.y = (height / 2);
-    graphbox.add( yLabel );
+    graphBox.add(yLabel);
 
-    var zLabel = spriteMaker("z");
+    var zLabel = spriteMaker('z');
     zLabel.position.x = (width / 2) + 0.15;
     zLabel.position.y = -0.1;
-    graphbox.add( zLabel );
+    graphBox.add(zLabel);
 
-    // Add completed graphbox to element's Object3D
-    object3D.add( graphbox );
+    // Add completed graphBox to element's Object3D
+    object3D.add(graphBox);
 
     /**
      * Create origin point.
      * This gives a solid reference point for scaling data.
      * It is positioned at the vertex of the left grid and bottom grid (towards the front).
      */
-    var originPointPosition = (-width / 2) + " 0 " + (depth / 2);
-    var originPointID = "originPoint" + data.id;
+    var originPointPosition = (-width / 2) + ' 0 ' + (depth / 2);
+    var originPointID = 'originPoint' + data.id;
 
-    d3.select(el).append("a-entity")
-                 .attr("id", originPointID)
-                 .attr("position", originPointPosition)
-                 // DEBUG
-                 //.attr("geometry", "primitive: sphere; radius: 0.021")
-                 //.attr("material", "color: green");
+    d3.select(el).append('a-entity')
+                 .attr('id', originPointID)
+                 .attr('position', originPointPosition);
+                 /** DEBUG
+                  * .attr('geometry', "primitive: sphere; radius: 0.021")
+                  * .attr('material', "color: green");
+                  */
 
-    if ( data.csv ) {
+    if (data.csv) {
       /* Plot data from CSV */
 
-      var originPoint = d3.select("#originPoint" + data.id);
+      var originPoint = d3.select('#originPoint' + data.id);
 
       // Convert CSV data from string to number
-      d3.csv(data.csv, function(data) {
-        data.forEach(function(d) {
+      d3.csv(data.csv, function (data) {
+        data.forEach(function (d) {
           d.x = +d.x;
           d.y = +d.y;
           d.z = +d.z;
         });
 
-        plotData(data)
+        plotData(data);
       });
 
-      function plotData(data) {
+      var plotData = function (data) {
         // Scale x, y, and z values
         // d3.extent is just short hand for d3.max and d3.min.
-        var xExtent = d3.extent(data, function(d) { return d.x });
+        var xExtent = d3.extent(data, function (d) { return d.x; });
         var xScale = d3.scale.linear()
                        .domain(xExtent)
                        .range([xRange[0], xRange[1]]);
 
-        var yExtent = d3.extent(data, function(d) { return d.y });
+        var yExtent = d3.extent(data, function (d) { return d.y; });
         var yScale = d3.scale.linear()
                        .domain(yExtent)
                        .range([yRange[0], yRange[1]]);
 
-        var zExtent = d3.extent(data, function(d) { return d.z });
+        var zExtent = d3.extent(data, function (d) { return d.z; });
         var zScale = d3.scale.linear()
                        .domain(zExtent)
                        .range([zRange[0], zRange[1]]);
 
         // Append data to graph and attach event listeners
-        originPoint.selectAll("a-sphere")
+        originPoint.selectAll('a-sphere')
                    .data(data)
                    .enter()
-                   .append("a-sphere")
-                   .attr("radius", 0.02)
-                   .attr("color", "#D50000")
-                   .attr("position", function(d) {
-                     return xScale(d.x) + " " + yScale(d.y) + " " + zScale(d.z);
+                   .append('a-sphere')
+                   .attr('radius', 0.02)
+                   .attr('color', '#D50000')
+                   .attr('position', function (d) {
+                     return xScale(d.x) + ' ' + yScale(d.y) + ' ' + zScale(d.z);
                    })
-                   .on("mouseenter", mouseEnter)
-                   .on("mouseleave", mouseLeave);
+                   .on('mouseenter', mouseEnter);
 
         /**
-         * Event listeners add and remove data labels.
+         * Event listener adds and removes data labels.
          * "this" refers to sphere element of a given data point.
          */
-        function mouseEnter() {
-          // Retrieve original data
-          var dataValues = this.__data__;
+        function mouseEnter () {
+          // Get height of graphBox (needed to scale label position)
+          var graphBoxEl = this.parentElement.parentElement;
+          var graphBoxData = graphBoxEl.components.graph.data;
+          var graphBoxHeight = graphBoxData.height;
 
-          // Give label object a name so it can be removed later
-          var label = new THREE.Object3D();
-          label.name = "tempDataLabel";
+          // Look for an existing label
+          var originPointObject3D = this.parentElement.object3D;
+          var oldLabel = originPointObject3D.getObjectByName('tempDataLabel');
 
-          // Create individual x, y, and z labels using original data values
-          // round to 1 decimal space (should use d3 format for consistency later)
-          var xLabel = spriteMaker( d3.round(dataValues.x, 1) + "," );
-          label.add( xLabel );
-
-          var yLabel = spriteMaker( d3.round(dataValues.y, 1) + "," );
-          yLabel.position.x = 0.15;
-          label.add( yLabel );
-
-          var zLabel = spriteMaker( d3.round(dataValues.z, 2) );
-          zLabel.position.x = 0.30;
-          label.add( zLabel );
-
-          // Position label above and behind data point
-          label.position.y = 0.1;
-          label.position.z = -0.1;
-
-          this.object3D.add( label );
+          // If there is no existing label, make one
+          if (oldLabel === undefined) {
+            labelMaker(this, graphBoxHeight);
+          } else {
+            // Remove old label
+            var labeledData = oldLabel.parent;
+            labeledData.remove(oldLabel);
+            // Remove highlight
+            var labeledDataEl = labeledData.el;
+            labeledDataEl.setAttribute('color', 'red');
+            labeledDataEl.setAttribute('radius', 0.02);
+            // Create new one
+            labelMaker(this, graphBoxHeight);
+          }
         }
-
-        function mouseLeave() {
-
-          var label = this.object3D.getObjectByName("tempDataLabel");
-          this.object3D.remove( label );
-        }
-      }
+      };
     }
-  },
+  }
 });
 
 /* HELPER FUNCTIONS */
@@ -195,25 +189,25 @@ AFRAME.registerComponent('graph', {
  * planeMaker() creates a plane given width and height (kind of).
  *  It is used by gridMaker().
  */
-function planeMaker(horizontal, vertical) {
+function planeMaker (horizontal, vertical) {
   // Controls texture repeat for U and V
   var uHorizontal = horizontal * 4;
   var vVertical = vertical * 4;
 
   // Load a texture, set wrap mode to repeat
-  var texture = new THREE.TextureLoader().load( "../assets/grid-textures/grid3.png" );
+  var texture = new THREE.TextureLoader().load('/assets/grid-textures/grid3.png');
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
   // should be: texture.anisotropy = renderer.getMaxAnisotropy();
   // but I can't figure out how to get this working
   texture.anisotropy = 16;
-  texture.repeat.set( uHorizontal, vVertical );
+  texture.repeat.set(uHorizontal, vVertical);
 
   // Create material and geometry
-  var material = new THREE.MeshBasicMaterial( { map: texture, side: THREE.DoubleSide } );
-  var geometry = new THREE.PlaneGeometry( horizontal, vertical );
+  var material = new THREE.MeshBasicMaterial({map: texture, side: THREE.DoubleSide});
+  var geometry = new THREE.PlaneGeometry(horizontal, vertical);
 
-  return new THREE.Mesh( geometry, material );
+  return new THREE.Mesh(geometry, material);
 }
 
 /**
@@ -223,27 +217,26 @@ function planeMaker(horizontal, vertical) {
  * There are many ways this function could be improved or done differently
  * e.g. buffer geometry, merge geometry, better reuse of material/geometry.
  */
-function gridMaker(width, height, depth) {
-
+function gridMaker (width, height, depth) {
   var grid = new THREE.Object3D();
 
   // AKA bottom grid
-  var xGrid = planeMaker( width, depth );
+  var xGrid = planeMaker(width, depth);
   xGrid.rotation.x = 90 * (Math.PI / 180);
-  grid.add( xGrid );
+  grid.add(xGrid);
 
   // AKA far grid
-  var yPlane = planeMaker( width, height );
+  var yPlane = planeMaker(width, height);
   yPlane.position.y = (0.5) * height;
   yPlane.position.z = (-0.5) * depth;
-  grid.add( yPlane );
+  grid.add(yPlane);
 
   // AKA side grid
-  var zPlane = planeMaker( depth, height )
+  var zPlane = planeMaker(depth, height);
   zPlane.position.x = (-0.5) * width;
   zPlane.position.y = (0.5) * height;
   zPlane.rotation.y = 90 * (Math.PI / 180);
-  grid.add( zPlane );
+  grid.add(zPlane);
 
   return grid;
 }
@@ -253,38 +246,76 @@ function gridMaker(width, height, depth) {
  * Based off the work of Lee Stemkoski and Sue Lockwood.
  * https://bocoup.com/weblog/learning-three-js-with-real-world-challenges-that-have-already-been-solved
  */
-function spriteMaker(message) {
-
+function spriteMaker (message) {
   // Create canvas, load font and size
   var canvas = document.createElement('canvas');
   var context = canvas.getContext('2d');
 
-  canvas.width = 64;
-  canvas.height = 64;
+  canvas.width = 256;
+  canvas.height = 256;
 
   // Scaling text to fit canvas...is tricky
   // http://stackoverflow.com/questions/4114052/best-method-of-scaling-text-to-fill-an-html5-canvas
-  context.font = "20px 'Helvetica'";
-  var metrics = context.measureText(message);
-  var textWidth = metrics.width;
 
-  var scalex = (canvas.width / textWidth);
-  var scaley = (canvas.height / 20);
+  // Setup font
+  context.font = "50px 'Helvetica'";
 
-  var ypos = (canvas.height / (scaley * 1.25));
+  // Measure text width
+  var text = context.measureText(message);
 
-  context.scale(scalex, scaley);
-  context.fillText(message, 0, ypos);
+  // Calculate position of text
+  var x = (canvas.width / 2) - (text.width / 2);
+  var y = canvas.height / 2;
+
+  // Draw
+  context.fillText(message, x, y);
+
+  /** DEBUG outline (to see canvas size)
+   * context.fillStyle = 'rgb(200,0,0)';
+   * context.strokeRect(0, 0, canvas.width, canvas.height);
+   */
 
   // canvas contents will be used for texture
-  var texture = new THREE.Texture(canvas)
-      texture.minFilter = THREE.LinearFilter;
-      texture.needsUpdate = true;
+  var texture = new THREE.Texture(canvas);
+  texture.minFilter = THREE.LinearFilter;
+  texture.needsUpdate = true;
 
   var spriteMaterial = new THREE.SpriteMaterial({ map: texture });
-  var sprite = new THREE.Sprite( spriteMaterial );
-  sprite.scale.set(0.125,0.125,0.125);
+  var sprite = new THREE.Sprite(spriteMaterial);
+  sprite.scale.set(0.5, 0.5, 0.5);
   return sprite;
+}
+
+/**
+ * labelMaker() creates a label for a given data point and graph height.
+ * Uses spriteMaker().
+ * dataEl - A data point's element.
+ * graphBoxHeight - The height of the graph.
+ */
+function labelMaker (dataEl, graphBoxHeight) {
+  // Retrieve original data
+  var dataValues = dataEl.__data__;
+
+  // Give label object a name so it can be removed later
+  var label = new THREE.Object3D();
+  label.name = 'tempDataLabel';
+
+  // Create individual x, y, and z labels using original data values
+  // round to 1 decimal space (should use d3 format for consistency later)
+  var spriteLabelText = '(' + d3.round(dataValues.x, 1) + ',' + d3.round(dataValues.y, 1) + ',' + d3.round(dataValues.z, 1) + ')';
+  var spriteLabel = spriteMaker(spriteLabelText);
+  label.add(spriteLabel);
+
+  // Position label above graph
+  var padding = 0.2;
+  var sphereYposition = dataEl.getAttribute('position').y;
+  label.position.y = (graphBoxHeight + padding) - sphereYposition;
+
+  // Highlight selected data point
+  dataEl.setAttribute('color', 'blue');
+  dataEl.setAttribute('radius', 0.03);
+
+  dataEl.object3D.add(label);
 }
 
 },{"d3":4}],3:[function(require,module,exports){
@@ -326,7 +357,7 @@ module.exports = {
             var value = attributes[key];
             style.setAttribute('data-' + key, value);
         }
-
+        
         if (style.sheet) { // for jsdom and IE9+
             style.innerHTML = cssText;
             style.sheet.cssText = cssText;
@@ -28467,7 +28498,7 @@ THREE.LineDashedMaterial.prototype.copy = function ( source ) {
 	THREE.Material.prototype.copy.call( this, source );
 
 	this.color.copy( source.color );
-
+	
 	this.linewidth = source.linewidth;
 
 	this.scale = source.scale;
@@ -29922,7 +29953,7 @@ THREE.DataTexture = function ( data, width, height, format, type, mapping, wrapS
 
 	this.magFilter = magFilter !== undefined ? magFilter : THREE.NearestFilter;
 	this.minFilter = minFilter !== undefined ? minFilter : THREE.NearestFilter;
-
+	
 	this.flipY = false;
 	this.generateMipmaps  = false;
 
@@ -30682,11 +30713,11 @@ THREE.Bone.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Bone.prototype.constructor = THREE.Bone;
 
 THREE.Bone.prototype.copy = function ( source ) {
-
+	
 	THREE.Object3D.prototype.copy.call( this, source );
-
+	
 	this.skin = source.skin;
-
+	
 	return this;
 
 };
@@ -30723,7 +30754,7 @@ THREE.Skeleton = function ( bones, boneInverses, useVertexTexture ) {
 		//       32x32 pixel texture max  256 bones * 4 pixels = (32 * 32)
 		//       64x64 pixel texture max 1024 bones * 4 pixels = (64 * 64)
 
-
+		
 		var size = Math.sqrt( this.bones.length * 4 ); // 4 pixels needed for 1 matrix
 		size = THREE.Math.nextPowerOfTwo( Math.ceil( size ) );
 		size = Math.max( size, 4 );
@@ -40437,7 +40468,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 	}
 
 	function painterSortStable ( a, b ) {
-
+		
 		if ( a.renderOrder !== b.renderOrder ) {
 
 			return a.renderOrder - b.renderOrder;
@@ -43650,7 +43681,7 @@ THREE.CubicBezierCurve.prototype.getPoint = function ( t ) {
 
 	var b3 = THREE.ShapeUtils.b3;
 
-	return new THREE.Vector2(
+	return new THREE.Vector2( 
 		b3( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x ),
 		b3( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y )
 	);
@@ -43661,7 +43692,7 @@ THREE.CubicBezierCurve.prototype.getTangent = function( t ) {
 
 	var tangentCubicBezier = THREE.CurveUtils.tangentCubicBezier;
 
-	return new THREE.Vector2(
+	return new THREE.Vector2( 
 		tangentCubicBezier( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x ),
 		tangentCubicBezier( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y )
 	).normalize();
@@ -43723,7 +43754,7 @@ THREE.EllipseCurve = function ( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle
 	this.aEndAngle = aEndAngle;
 
 	this.aClockwise = aClockwise;
-
+	
 	this.aRotation = aRotation || 0;
 
 };
@@ -43749,7 +43780,7 @@ THREE.EllipseCurve.prototype.getPoint = function ( t ) {
 		angle = this.aStartAngle + t * deltaAngle;
 
 	}
-
+	
 	var x = this.aX + this.xRadius * Math.cos( angle );
 	var y = this.aY + this.yRadius * Math.sin( angle );
 
@@ -43832,7 +43863,7 @@ THREE.QuadraticBezierCurve3 = THREE.Curve.create(
 
 	function ( t ) {
 
-		var b2 = THREE.ShapeUtils.b2;
+		var b2 = THREE.ShapeUtils.b2;		
 
 		return new THREE.Vector3(
 			b2( t, this.v0.x, this.v1.x, this.v2.x ),
@@ -47236,7 +47267,7 @@ THREE.ArrowHelper = ( function () {
 		if ( headWidth === undefined ) headWidth = 0.2 * headLength;
 
 		this.position.copy( origin );
-
+		
 		this.line = new THREE.Line( lineGeometry, new THREE.LineBasicMaterial( { color: color } ) );
 		this.line.matrixAutoUpdate = false;
 		this.add( this.line );
@@ -49680,7 +49711,7 @@ ComplementaryFilter.prototype.addGyroMeasurement = function(vector, timestampS) 
   if (Util.isTimestampDeltaValid(deltaT)) {
     this.run_();
   }
-
+  
   this.previousGyroMeasurement.copy(this.currentGyroMeasurement);
 };
 
@@ -62376,7 +62407,7 @@ module.exports = getWakeLock();
           svg.remove();
         }
       }
-      if (d3_mouse_bug44083) point.x = e.pageX, point.y = e.pageY; else point.x = e.clientX,
+      if (d3_mouse_bug44083) point.x = e.pageX, point.y = e.pageY; else point.x = e.clientX, 
       point.y = e.clientY;
       point = point.matrixTransform(container.getScreenCTM().inverse());
       return [ point.x, point.y ];
@@ -62751,7 +62782,7 @@ module.exports = getWakeLock();
     }
     function mousewheeled() {
       var dispatch = event.of(this, arguments);
-      if (mousewheelTimer) clearTimeout(mousewheelTimer); else d3_selection_interrupt.call(this),
+      if (mousewheelTimer) clearTimeout(mousewheelTimer); else d3_selection_interrupt.call(this), 
       translate0 = location(center0 = center || d3.mouse(this)), zoomstarted(dispatch);
       mousewheelTimer = setTimeout(function() {
         mousewheelTimer = null;
@@ -63120,7 +63151,7 @@ module.exports = getWakeLock();
   d3.xhr = d3_xhrType(d3_identity);
   function d3_xhrType(response) {
     return function(url, mimeType, callback) {
-      if (arguments.length === 2 && typeof mimeType === "function") callback = mimeType,
+      if (arguments.length === 2 && typeof mimeType === "function") callback = mimeType, 
       mimeType = null;
       return d3_xhr(url, mimeType, response, callback);
     };
@@ -63961,7 +63992,7 @@ module.exports = getWakeLock();
     return n ? (date.y = d3_time_expandYear(+n[0]), i + n[0].length) : -1;
   }
   function d3_time_parseZone(date, string, i) {
-    return /^[+-]\d{4}$/.test(string = string.slice(i, i + 5)) ? (date.Z = -string,
+    return /^[+-]\d{4}$/.test(string = string.slice(i, i + 5)) ? (date.Z = -string, 
     i + 5) : -1;
   }
   function d3_time_expandYear(d) {
@@ -64154,7 +64185,7 @@ module.exports = getWakeLock();
     var λ00, φ00, λ0, cosφ0, sinφ0;
     d3_geo_area.point = function(λ, φ) {
       d3_geo_area.point = nextPoint;
-      λ0 = (λ00 = λ) * d3_radians, cosφ0 = Math.cos(φ = (φ00 = φ) * d3_radians / 2 + π / 4),
+      λ0 = (λ00 = λ) * d3_radians, cosφ0 = Math.cos(φ = (φ00 = φ) * d3_radians / 2 + π / 4), 
       sinφ0 = Math.sin(φ);
     };
     function nextPoint(λ, φ) {
@@ -65983,7 +66014,7 @@ module.exports = getWakeLock();
       return _ ? center([ -_[1], _[0] ]) : (_ = center(), [ _[1], -_[0] ]);
     };
     projection.rotate = function(_) {
-      return _ ? rotate([ _[0], _[1], _.length > 2 ? _[2] + 90 : 90 ]) : (_ = rotate(),
+      return _ ? rotate([ _[0], _[1], _.length > 2 ? _[2] + 90 : 90 ]) : (_ = rotate(), 
       [ _[0], _[1], _[2] - 90 ]);
     };
     return rotate([ 0, 0, 90 ]);
@@ -66837,7 +66868,7 @@ module.exports = getWakeLock();
     };
     quadtree.extent = function(_) {
       if (!arguments.length) return x1 == null ? null : [ [ x1, y1 ], [ x2, y2 ] ];
-      if (_ == null) x1 = y1 = x2 = y2 = null; else x1 = +_[0][0], y1 = +_[0][1], x2 = +_[1][0],
+      if (_ == null) x1 = y1 = x2 = y2 = null; else x1 = +_[0][0], y1 = +_[0][1], x2 = +_[1][0], 
       y2 = +_[1][1];
       return quadtree;
     };
@@ -68562,7 +68593,7 @@ module.exports = getWakeLock();
         return d3_layout_treemapPad(node, x);
       }
       var type;
-      pad = (padding = x) == null ? d3_layout_treemapPadNull : (type = typeof x) === "function" ? padFunction : type === "number" ? (x = [ x, x, x, x ],
+      pad = (padding = x) == null ? d3_layout_treemapPadNull : (type = typeof x) === "function" ? padFunction : type === "number" ? (x = [ x, x, x, x ], 
       padConstant) : padConstant;
       return treemap;
     };
@@ -68965,7 +68996,7 @@ module.exports = getWakeLock();
     };
     scale.rangePoints = function(x, padding) {
       if (arguments.length < 2) padding = 0;
-      var start = x[0], stop = x[1], step = domain.length < 2 ? (start = (start + stop) / 2,
+      var start = x[0], stop = x[1], step = domain.length < 2 ? (start = (start + stop) / 2, 
       0) : (stop - start) / (domain.length - 1 + padding);
       range = steps(start + step * padding / 2, step);
       rangeBand = 0;
@@ -68977,7 +69008,7 @@ module.exports = getWakeLock();
     };
     scale.rangeRoundPoints = function(x, padding) {
       if (arguments.length < 2) padding = 0;
-      var start = x[0], stop = x[1], step = domain.length < 2 ? (start = stop = Math.round((start + stop) / 2),
+      var start = x[0], stop = x[1], step = domain.length < 2 ? (start = stop = Math.round((start + stop) / 2), 
       0) : (stop - start) / (domain.length - 1 + padding) | 0;
       range = steps(start + Math.round(step * padding / 2 + (stop - start - (domain.length - 1 + padding) * step) / 2), step);
       rangeBand = 0;
@@ -69405,7 +69436,7 @@ module.exports = getWakeLock();
     return points.length < 4 ? d3_svg_lineLinear(points) : points[1] + d3_svg_lineHermite(points.slice(1, -1), d3_svg_lineCardinalTangents(points, tension));
   }
   function d3_svg_lineCardinalClosed(points, tension) {
-    return points.length < 3 ? d3_svg_lineLinearClosed(points) : points[0] + d3_svg_lineHermite((points.push(points[0]),
+    return points.length < 3 ? d3_svg_lineLinearClosed(points) : points[0] + d3_svg_lineHermite((points.push(points[0]), 
     points), d3_svg_lineCardinalTangents([ points[points.length - 2] ].concat(points, [ points[1] ]), tension));
   }
   function d3_svg_lineCardinal(points, tension) {
@@ -70178,7 +70209,7 @@ module.exports = getWakeLock();
         var g = d3.select(this);
         var scale0 = this.__chart__ || scale, scale1 = this.__chart__ = scale.copy();
         var ticks = tickValues == null ? scale1.ticks ? scale1.ticks.apply(scale1, tickArguments_) : scale1.domain() : tickValues, tickFormat = tickFormat_ == null ? scale1.tickFormat ? scale1.tickFormat.apply(scale1, tickArguments_) : d3_identity : tickFormat_, tick = g.selectAll(".tick").data(ticks, scale1), tickEnter = tick.enter().insert("g", ".domain").attr("class", "tick").style("opacity", ε), tickExit = d3.transition(tick.exit()).style("opacity", ε).remove(), tickUpdate = d3.transition(tick.order()).style("opacity", 1), tickSpacing = Math.max(innerTickSize, 0) + tickPadding, tickTransform;
-        var range = d3_scaleRange(scale1), path = g.selectAll(".domain").data([ 0 ]), pathUpdate = (path.enter().append("path").attr("class", "domain"),
+        var range = d3_scaleRange(scale1), path = g.selectAll(".domain").data([ 0 ]), pathUpdate = (path.enter().append("path").attr("class", "domain"), 
         d3.transition(path));
         tickEnter.append("line");
         tickEnter.append("text");
