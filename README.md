@@ -45,7 +45,7 @@ The range is a bit more complicated. Before data is plotted, an "origin point" i
 
 The labels used here are THREE.Sprites textured with 2D canvas.
 
-This solution is only half-complete. Labels for data points look odd because they are created in pieces rather than being a single sprite, see the "scaling data" test page for an example. This is a workaround until I can figure out how to scale the 2D canvas more elegantly. The problem is caused by poor handling of long text, attempting to render more than a character or two results in text smooshing together.
+This solution is only half-complete due to problems with the cursor. Mayognaise's wonderful [mouse-cursor component](https://github.com/mayognaise/aframe-mouse-cursor-component) works well for selecting data points with the mouse, but the standard look-cursor is terribly buggy.
 
 Alternative means of handling text were evaluated, but sprites were the only contender I could get working correctly. Text Geometry was a contender, but the look-at component failed to coerce them into looking at the camera. It would be nice if A-Frame introduced a built-in way of dealing with text, perhaps using a font atlas and SDF.
 
