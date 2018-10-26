@@ -58,7 +58,7 @@ The purpose of this component is to enable basic 3D graphing and explore the use
 Since D3 is a dependency, you'll need to set the charset to UTF-8 in the script tag.
 
 ```html
-<script src="https://rawgit.com/bryik/aframe-graph-component/master/dist/aframe-graph-component.min.js" charset="utf-8"></script>
+<script src="https://cdn.jsdelivr.net/gh/bryik/aframe-graph-component@856687ff0214cbbabef4189507af93c1f72ae4a9/dist/aframe-graph-component.min.js" charset="utf-8"></script>
 ```
 
 ### TODO
@@ -85,7 +85,7 @@ Install and use by directly including the [browser files](dist):
 <head>
   <title>My A-Frame Scene</title>
   <script src="https://aframe.io/releases/0.2.0/aframe.min.js"></script>
-  <script src="https://rawgit.com/bryik/aframe-graph-component/master/dist/aframe-graph-component.min.js" charset="utf-8"></script>
+  <script src="https://cdn.jsdelivr.net/gh/bryik/aframe-graph-component@856687ff0214cbbabef4189507af93c1f72ae4a9/dist/aframe-graph-component.min.js" charset="utf-8"></script>
 </head>
 
 <body>
